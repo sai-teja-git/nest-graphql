@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DATA } from 'src/const/data.const';
-import { Author } from 'src/entities/author.entity';
-import { Book } from 'src/entities/book.entity';
+import { Author } from 'src/authors/entities/author.entity';
+import { Book } from 'src/books/entities/book.entity';
 import { Repository } from 'typeorm';
+import { DATA } from './data.const';
 
 @Injectable()
 export class SeedService {

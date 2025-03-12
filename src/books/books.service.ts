@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBookInput } from './dto/create-book.input';
-import { UpdateBookInput } from './dto/update-book.input';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Book } from './entities/book.entity';
 
 @Injectable()
 export class BooksService {
-  create(createBookInput: CreateBookInput) {
-    return 'This action adds a new book';
+
+  constructor(
+    @InjectRepository(Book)
+    private bookRepository: Repository<Book>
+  ) { }
+
+  async getAllBooks(where: any) {
+    try {
+      const data = await this.bookRepository.find({ where })
+      return data
+    } catch (e) {
+      throw new HttpException(e.message ?? "Failed to fetch", e.status ?? HttpStatus.INTERNAL_SERVER_ERROR)
+    }
   }
 
-  findAll() {
-    return `This action returns all books`;
+  async getBook(id: number) {
+    try {
+      const data = await this.bookRepository.findOne({ where: { id } })
+      return data
+    } catch (e) {
+      throw new HttpException(e.message ?? "Failed to fetch", e.status ?? HttpStatus.INTERNAL_SERVER_ERROR)
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} book`;
+  async getBookAuthors(id: number) {
+    try {
+      const data = await this.bookRepository.find({ where: [{ author: { id } }] })
+      return data
+    } catch (e) {
+      throw new HttpException(e.message ?? "Failed to fetch", e.status ?? HttpStatus.INTERNAL_SERVER_ERROR)
+    }
   }
 
-  update(id: number, updateBookInput: UpdateBookInput) {
-    return `This action updates a #${id} book`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} book`;
-  }
 }

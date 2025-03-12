@@ -5,12 +5,12 @@ import { ConfigModule } from "@nestjs/config"
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { SeedService } from './seed/seed.service';
-import { Author } from './entities/author.entity';
-import { Book } from './entities/book.entity';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
-import { BooksModule } from './books/books.module';
 import { join } from 'path';
+import { BooksModule } from './books/books.module';
+import { AuthorsModule } from './authors/authors.module';
+import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default"
 
 @Module({
   imports: [
@@ -26,12 +26,16 @@ import { join } from 'path';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       playground: false,
-      include: [BooksModule],
-      typePaths: ['./**/*.graphql'],
+      include: [
+        BooksModule,
+        AuthorsModule
+      ],
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      plugins: [ApolloServerPluginLandingPageLocalDefault()]
     }),
-    TypeOrmModule.forFeature([Author, Book]),
     UsersModule,
     BooksModule,
+    AuthorsModule,
   ],
   controllers: [AppController],
   providers: [AppService, SeedService],

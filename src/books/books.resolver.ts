@@ -1,34 +1,43 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { AuthorsService } from 'src/authors/authors.service';
+import { Author } from 'src/authors/entities/author.entity';
 import { BooksService } from './books.service';
-import { CreateBookInput } from './dto/create-book.input';
-import { UpdateBookInput } from './dto/update-book.input';
+import { Book, FindBookInput } from './entities/book.entity';
 
-@Resolver('Book')
+@Resolver(() => Book)
 export class BooksResolver {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(
+    private readonly booksService: BooksService,
+    private readonly authorService: AuthorsService
+  ) { }
 
-  @Mutation('createBook')
-  create(@Args('createBookInput') createBookInput: CreateBookInput) {
-    return this.booksService.create(createBookInput);
+  // @Mutation(() => Book)
+  // createBook(@Args('createBookInput') createBookInput: CreateBookInput) {
+  //   return this.booksService.create(createBookInput);
+  // }
+
+  @Query(() => [Book], { name: 'books' })
+  async findAll(@Args("where") where: FindBookInput) {
+    return await this.booksService.getAllBooks(where);
   }
 
-  @Query('books')
-  findAll() {
-    return this.booksService.findAll();
+  @Query(() => Book, { name: 'book' })
+  findOne(@Args('id') { id }: FindBookInput) {
+    return this.booksService.getBook(id as number);
   }
 
-  @Query('book')
-  findOne(@Args('id') id: number) {
-    return this.booksService.findOne(id);
+  @ResolveField(() => Author, { name: "author" })
+  async author(@Parent() parent: Book) {
+    return await this.authorService.getAuthorBooks(parent.id)
   }
 
-  @Mutation('updateBook')
-  update(@Args('updateBookInput') updateBookInput: UpdateBookInput) {
-    return this.booksService.update(updateBookInput.id, updateBookInput);
-  }
+  // @Mutation(() => Book)
+  // updateBook(@Args('updateBookInput') updateBookInput: UpdateBookInput) {
+  //   return this.booksService.update(updateBookInput.id, updateBookInput);
+  // }
 
-  @Mutation('removeBook')
-  remove(@Args('id') id: number) {
-    return this.booksService.remove(id);
-  }
+  // @Mutation(() => Book)
+  // removeBook(@Args('id', { type: () => Int }) id: number) {
+  //   return this.booksService.remove(id);
+  // }
 }
