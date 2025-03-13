@@ -11,9 +11,18 @@ export class BooksService {
     private bookRepository: Repository<Book>
   ) { }
 
-  async getAllBooks(where: any) {
+  async getAllBooks(where: any, selectedFields: any[]) {
     try {
-      const data = await this.bookRepository.find({ where })
+      console.log('selectedFields', selectedFields)
+      // const data = await this.bookRepository.find({ where, select: selectedFields.length > 0 ? selectedFields : ['book.id'] })
+      const data = await this.bookRepository.createQueryBuilder('book')
+        .select(selectedFields.length > 0 ? selectedFields : ['book.id'])
+        .getMany();
+
+      const queryRaw = this.bookRepository.createQueryBuilder('book')
+        .select(selectedFields.length > 0 ? selectedFields : ['book.id'])
+        .getQuery();
+      console.log('queryRaw>>', queryRaw)
       return data
     } catch (e) {
       throw new HttpException(e.message ?? "Failed to fetch", e.status ?? HttpStatus.INTERNAL_SERVER_ERROR)
