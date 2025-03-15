@@ -11,6 +11,22 @@ export class BooksService {
     private bookRepository: Repository<Book>
   ) { }
 
+  /**
+   * The function `getAllBooks` retrieves books based on specified fields using TypeORM in TypeScript.
+   * @param {any} where - The `where` parameter in the `getAllBooks` function is used to specify
+   * conditions for filtering the books to be retrieved. It allows you to define criteria based on the
+   * properties of the books, such as title, author, genre, etc. This helps in narrowing down the
+   * results to only include books
+   * @param {any[]} selectedFields - The `selectedFields` parameter in the `getAllBooks` function is an
+   * array that contains the fields that you want to select from the database query. If the
+   * `selectedFields` array is empty, it defaults to selecting only the `book.id` field. Otherwise, it
+   * selects the fields specified in
+   * @returns The `getAllBooks` function is returning the data fetched from the database based on the
+   * provided `where` condition and `selectedFields`. The function first logs the `selectedFields`
+   * array, then uses the TypeORM `createQueryBuilder` method to construct a query to select the
+   * specified fields or default to selecting the book id if no fields are provided. The data is
+   * retrieved using `getMany()` method.
+   */
   async getAllBooks(where: any, selectedFields: any[]) {
     try {
       console.log('selectedFields', selectedFields)
