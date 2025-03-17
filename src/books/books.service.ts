@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Book } from './entities/book.entity';
+import { Book, FindBookInput } from './entities/book.entity';
+import * as graphqlFields from 'graphql-fields';
+import { GraphQLResolveInfo } from 'graphql';
 
 @Injectable()
 export class BooksService {
@@ -27,22 +29,50 @@ export class BooksService {
    * specified fields or default to selecting the book id if no fields are provided. The data is
    * retrieved using `getMany()` method.
    */
-  async getAllBooks(where: any, selectedFields: any[]) {
+  async getAllBooks(where: FindBookInput, graphqlInfo: GraphQLResolveInfo) {
     try {
-      console.log('selectedFields', selectedFields)
-      // const data = await this.bookRepository.find({ where, select: selectedFields.length > 0 ? selectedFields : ['book.id'] })
-      const data = await this.bookRepository.createQueryBuilder('book')
+      const selectedFields = this.getSelectedFields(graphqlInfo)
+      console.table(selectedFields)
+      const queryBuilder = this.bookRepository.createQueryBuilder('book')
         .select(selectedFields.length > 0 ? selectedFields : ['book.id'])
-        .getMany();
+      if (where.rating) {
+        if (where.rating.gt) {
+          queryBuilder.andWhere('book.rating > :ratingGt', { ratingGt: where.rating.gt });
+        }
+        if (where.rating.lt) {
+          queryBuilder.andWhere('book.rating < :ratingLt', { ratingLt: where.rating.lt });
+        }
+        if (where.rating.eq) {
+          queryBuilder.andWhere('book.rating = :ratingEq', { ratingEq: where.rating.eq });
+        }
+        if (where.rating.gte) {
+          queryBuilder.andWhere('book.rating >= :ratingGte', { ratingGte: where.rating.gte });
+        }
+        if (where.rating.lte) {
+          queryBuilder.andWhere('book.rating <= :ratingLte', { ratingLte: where.rating.lte });
+        }
+      }
+      const data = await queryBuilder.getMany();
 
-      const queryRaw = this.bookRepository.createQueryBuilder('book')
-        .select(selectedFields.length > 0 ? selectedFields : ['book.id'])
-        .getQuery();
+      const queryRaw = await queryBuilder.getQuery();
       console.log('queryRaw>>', queryRaw)
       return data
     } catch (e) {
       throw new HttpException(e.message ?? "Failed to fetch", e.status ?? HttpStatus.INTERNAL_SERVER_ERROR)
     }
+  }
+
+  /**
+   * This method extracts the selected fields from the GraphQL query info.
+   * It uses the graphqlFields library to parse the info object and retrieve the fields requested in the query.
+   * The method then maps these fields to a format prefixed with "book." to match the expected format for the service layer.
+   * 
+   * @param info - The GraphQLResolveInfo object containing the query information.
+   * @returns An array of strings representing the selected fields, each prefixed with "book.".
+   */
+  private getSelectedFields(info: GraphQLResolveInfo): string[] {
+    const fields = graphqlFields(info);
+    return Object.keys(fields).map(field => `book.${field}`);
   }
 
   async getBook(id: number) {

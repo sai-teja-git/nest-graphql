@@ -37,7 +37,7 @@ type Query {
 }
 
 input FindAuthorInput {
-  id: ID
+  id: Float
   name: String
   birth_year: Float
   nationality: String
@@ -51,7 +51,15 @@ input FindBookInput {
   title: String
   published_year: Float
   genre: String
-  rating: Float
+  rating: RatingComparisonInput
   created_at: DateTime
   updated_at: DateTime
+}
+
+input RatingComparisonInput {
+  gt: Float
+  lt: Float
+  eq: Float
+  gte: Float
+  lte: Float
 }

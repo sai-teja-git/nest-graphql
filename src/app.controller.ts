@@ -11,6 +11,11 @@ export class AppController {
   }
 
   @Get("books")
+  async getBooks() {
+    return await this.appService.getBooks()
+  }
+
+  @Get("books-data")
   async getBooksData() {
     return await this.appService.getBooksData()
   }

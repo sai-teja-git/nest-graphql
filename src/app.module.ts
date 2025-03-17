@@ -11,6 +11,7 @@ import { join } from 'path';
 import { BooksModule } from './books/books.module';
 import { AuthorsModule } from './authors/authors.module';
 import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default"
+import { GraphQLClient } from 'graphql-request';
 
 @Module({
   imports: [
@@ -38,6 +39,13 @@ import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin
     AuthorsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, SeedService],
+  providers: [
+    AppService,
+    SeedService,
+    {
+      provide: GraphQLClient,
+      useValue: new GraphQLClient('http://127.0.0.1:5200/graphql'),
+    },
+  ],
 })
 export class AppModule { }

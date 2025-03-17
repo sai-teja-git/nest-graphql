@@ -21,7 +21,7 @@ export class Book {
   @Field()
   genre: string;
 
-  @Column()
+  @Column({ type: "real" })
   @Field()
   rating: number
 
@@ -42,6 +42,24 @@ export class Book {
 }
 
 @InputType()
+class RatingComparisonInput {
+  @Field(() => Number, { nullable: true })
+  gt?: number;
+
+  @Field(() => Number, { nullable: true })
+  lt?: number;
+
+  @Field(() => Number, { nullable: true })
+  eq?: number;
+
+  @Field(() => Number, { nullable: true })
+  gte?: number;
+
+  @Field(() => Number, { nullable: true })
+  lte?: number;
+}
+
+@InputType()
 export class FindBookInput {
   @Field({ nullable: true })
   id?: number;
@@ -56,7 +74,7 @@ export class FindBookInput {
   genre?: string;
 
   @Field({ nullable: true })
-  rating?: number
+  rating?: RatingComparisonInput;
 
   @Field({ nullable: true })
   created_at?: Date

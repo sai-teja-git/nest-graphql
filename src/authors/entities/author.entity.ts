@@ -41,27 +41,27 @@ export class Author {
 }
 
 @InputType()
-export class FindAuthorInput extends PartialType(OmitType(Author, ['books'], InputType)) { }
-// export class FindAuthorInput {
+// export class FindAuthorInput extends PartialType(OmitType(Author, ['books'], InputType)) { }
+export class FindAuthorInput {
 
-//   @Field({ nullable: true })
-//   id?: number;
+  @Field({ nullable: true })
+  id?: number;
 
-//   @Field({ nullable: true })
-//   name?: string;
+  @Field({ nullable: true })
+  name?: string;
 
-//   @Field({ nullable: true })
-//   birth_year?: number;
+  @Field({ nullable: true })
+  birth_year?: number;
 
-//   @Field({ nullable: true })
-//   nationality?: string;
+  @Field({ nullable: true })
+  nationality?: string;
 
-//   @Field({ nullable: true })
-//   bio?: string;
+  @Field({ nullable: true })
+  bio?: string;
 
-//   @Field({ nullable: true })
-//   created_at?: Date
+  @Field({ nullable: true })
+  created_at?: Date
 
-//   @Field({ nullable: true })
-//   updated_at?: Date
-// }
+  @Field({ nullable: true })
+  updated_at?: Date
+}
