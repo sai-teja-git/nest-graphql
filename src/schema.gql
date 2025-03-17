@@ -33,7 +33,7 @@ type Query {
   authors(where: FindAuthorInput!): [Author!]!
   author(id: FindAuthorInput!): Author!
   books(where: FindBookInput!): [Book!]!
-  book(id: FindBookInput!): Book!
+  book(where: FindBookInput!): Book!
 }
 
 input FindAuthorInput {

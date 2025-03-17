@@ -24,8 +24,8 @@ export class BooksResolver {
   }
 
   @Query(() => Book, { name: 'book' })
-  findOne(@Args('id') { id }: FindBookInput) {
-    return this.booksService.getBook(id as number);
+  findOne(@Args('where') where: FindBookInput, @Info() info: GraphQLResolveInfo) {
+    return this.booksService.getBook(where, info);
   }
 
   @ResolveField(() => Author, { name: "author" })

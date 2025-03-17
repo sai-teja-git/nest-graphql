@@ -52,6 +52,12 @@ export class BooksService {
           queryBuilder.andWhere('book.rating <= :ratingLte', { ratingLte: where.rating.lte });
         }
       }
+
+      for (let key in where) {
+        if (key !== "rating") {
+          queryBuilder.andWhere(`book.${key} = :key`, { [key]: where[key] });
+        }
+      }
       const data = await queryBuilder.getMany();
 
       const queryRaw = await queryBuilder.getQuery();
@@ -75,10 +81,40 @@ export class BooksService {
     return Object.keys(fields).map(field => `book.${field}`);
   }
 
-  async getBook(id: number) {
+  async getBook(where: FindBookInput, graphqlInfo: GraphQLResolveInfo) {
     try {
-      const data = await this.bookRepository.findOne({ where: { id } })
-      return data
+      const selectedFields = this.getSelectedFields(graphqlInfo)
+      console.table(selectedFields)
+      const queryBuilder = this.bookRepository.createQueryBuilder('book')
+        .select(selectedFields.length > 0 ? selectedFields : ['book.id'])
+
+      if (where.rating) {
+        if (where.rating.gt) {
+          queryBuilder.andWhere('book.rating > :ratingGt', { ratingGt: where.rating.gt });
+        }
+        if (where.rating.lt) {
+          queryBuilder.andWhere('book.rating < :ratingLt', { ratingLt: where.rating.lt });
+        }
+        if (where.rating.eq) {
+          queryBuilder.andWhere('book.rating = :ratingEq', { ratingEq: where.rating.eq });
+        }
+        if (where.rating.gte) {
+          queryBuilder.andWhere('book.rating >= :ratingGte', { ratingGte: where.rating.gte });
+        }
+        if (where.rating.lte) {
+          queryBuilder.andWhere('book.rating <= :ratingLte', { ratingLte: where.rating.lte });
+        }
+      }
+
+      for (let key in where) {
+        if (key !== "rating") {
+          queryBuilder.andWhere(`book.${key} = :${key}`, { [`${key}`]: where[key] });
+        }
+      }
+      console.log('queryBuilder.getQuery', queryBuilder.getQuery())
+
+      const data = await queryBuilder.getOne();
+      return data;
     } catch (e) {
       throw new HttpException(e.message ?? "Failed to fetch", e.status ?? HttpStatus.INTERNAL_SERVER_ERROR)
     }
